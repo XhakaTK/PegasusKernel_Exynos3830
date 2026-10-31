@@ -411,19 +411,6 @@ $(obj)/%.dt.yaml: $(src)/%.dts $(DTC) $(DT_TMP_SCHEMA) FORCE
 
 dtc-tmp = $(subst $(comma),_,$(dot-target).dts.tmp)
 
-# mkdtboimg
-# ----------------------------------------------------------------------------
-# Pack DTB/DTBO overlays into a dtbo.img, using the AOSP script instead of
-# requiring mkdtimg to be installed on the host.
-quiet_cmd_mkdtboimg = DTBOIMG $@
-cmd_mkdtboimg = $(PYTHON3) $(srctree)/scripts/mkdtboimg.py create $@ \
-		--page_size=$(DTBO_PAGE_SIZE) $(filter-out FORCE,$^)
-
-# cat
-# ---------------------------------------------------------------------------
-quiet_cmd_cat = CAT     $@
-      cmd_cat = cat $(real-prereqs) > $@
-
 # Bzip2
 # ---------------------------------------------------------------------------
 

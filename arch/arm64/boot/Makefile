@@ -17,24 +17,6 @@
 OBJCOPYFLAGS_Image :=-O binary -R .note -R .note.gnu.build-id -R .comment -S
 
 targets := Image Image.bz2 Image.gz Image.lz4 Image.lzma Image.lzo
-targets += dtb.img dtbo.img
-
-# Device trees to build.  SUBDIRS selects which subdirectory of
-# arch/arm64/boot/dts/ to pack, so "make SUBDIRS=samsung/a12s dtbo.img"
-# produces an image with only that board's overlays.  Without SUBDIRS every
-# entry of the dts Makefile is packed, matching what "make dtbs" builds.
-dtsmakefile := $(srctree)/arch/arm64/boot/dts/Makefile
-dtstree := $(srctree)/arch/arm64/boot/dts
-SUBDIRS ?=
-list_dts = $(shell awk -v prefix="$(SUBDIRS)/" -v var="$(1)" \
-	'$$1 == var && $$2 == "+=" && (prefix == "/" || index($$3, prefix) == 1) { print $$3 }' \
-	$(dtsmakefile))
-
-DTB_LIST  ?= $(call list_dts,dtb-y)
-DTBO_LIST ?= $(call list_dts,dtbo-y)
-DTB_OBJS  := $(addprefix $(dtstree)/, $(DTB_LIST))
-DTBO_OBJS := $(addprefix $(dtstree)/, $(DTBO_LIST))
-DTBO_PAGE_SIZE ?= 4096
 
 $(obj)/Image: vmlinux FORCE
 	$(call if_changed,objcopy)
@@ -53,12 +35,6 @@ $(obj)/Image.lzma: $(obj)/Image FORCE
 
 $(obj)/Image.lzo: $(obj)/Image FORCE
 	$(call if_changed,lzo)
-
-$(obj)/dtb.img: $(DTB_OBJS) FORCE
-	$(call if_changed,cat)
-
-$(obj)/dtbo.img: $(DTBO_OBJS) FORCE
-	$(call if_changed,mkdtboimg)
 
 install:
 	$(CONFIG_SHELL) $(srctree)/$(src)/install.sh $(KERNELRELEASE) \
