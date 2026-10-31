@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 
 # Build do PegasusKernel (Exynos 850 / a12s): ponto de entrada unico. Carrega
-# dependencia e toolchain, compila e coleta Image/Image.gz/dtb.img/dtbo.img,
-# System.map e .config em out/. O comportamento sai de variaveis de ambiente:
+# dependencia e toolchain, compila e coleta Image/Image.gz, System.map e
+# .config em out/. O comportamento sai de variaveis de ambiente:
 # VARIANT (e|p), DEFCONFIG, JOBS, CLANG_DIR e DEVICE_TARGET.
 
 set -e
@@ -176,18 +176,15 @@ mkdir -p "$OUT_DIR/arch/arm64/boot"
 
 make $MAKE_ARGS "$DEFCONFIG"
 make $MAKE_ARGS -j"$JOBS"
-# dtb.img/dtbo.img nao sao alvo de 'all', mas a coleta de artefatos precisa deles
-make $MAKE_ARGS dtbs dtb.img dtbo.img
 
 [ -f arch/arm64/boot/Image ] || error "Compilacao falhou! Image nao encontrado."
 
 msg "Kernel compilada! Coletando artefatos..."
-cp arch/arm64/boot/Image arch/arm64/boot/Image.gz \
-    arch/arm64/boot/dtb.img arch/arm64/boot/dtbo.img "$OUT_DIR/arch/arm64/boot/"
+cp arch/arm64/boot/Image arch/arm64/boot/Image.gz "$OUT_DIR/arch/arm64/boot/"
 cp System.map "$OUT_DIR/"
 cp .config "$OUT_DIR/.config"
 
-for f in Image Image.gz dtb.img dtbo.img; do
+for f in Image Image.gz; do
     printf '%-10s %12s bytes\n' "$f" "$(stat -c %s "$OUT_DIR/arch/arm64/boot/$f")"
 done
 

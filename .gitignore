@@ -6,3 +6,6 @@
 
 # Toolchain (clonada/extraida pelo build.sh; nunca versionar)
 /toolchains/
+
+# DTB/DTBO gerados pelo build
+*.dtbo
