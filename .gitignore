@@ -9,3 +9,5 @@
 
 # DTB/DTBO gerados pelo build
 *.dtbo
+*.dtout
+*.reverse.dts
